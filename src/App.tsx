@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { FC } from 'react';
+import axios from 'axios';
 import { FilteredTextInput } from './components/FilteredTextinput';
 import Login from './components/Login';
 import ReactMarkdown from 'react-markdown';
@@ -153,20 +154,11 @@ function App() {
 
     try {
       // Call our backend API
-      const apiResponse = await fetch('http://localhost:3001/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // The backend uses the history from the previous turn. We only need to send the new message.
-        body: JSON.stringify({ history: apiHistory, message: prompt }),
+      const apiResponse = await axios.post(import.meta.env.VITE_API_URL, {
+        history: apiHistory,
+        message: prompt,
       });
-
-      if (!apiResponse.ok) {
-        throw new Error(`HTTP error! status: ${apiResponse.status}`);
-      }
-
-      const data = await apiResponse.json();
+      const data = apiResponse.data;
 
       // Add AI response to history
       const aiMessage: Message = { role: 'model', parts: [{ text: data.response }] };
